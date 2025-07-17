@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 application.yml
 Lavalink.jar
 config.json
+package-lock.json

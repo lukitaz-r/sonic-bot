@@ -18,6 +18,7 @@ const client = new Discord.Client({
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 client.color = config.color;
+client.config = config
 
 Object.freeze(client.la);
 
