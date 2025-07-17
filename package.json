@@ -1,30 +1,30 @@
 {
   "name": "sonic-bot",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Bot multifuncional de Discord, hecho en discord.js v14, para TheSonic",
-  "main": "src/index.ts",
-  "scripts": {
-    "start": "ts-node src/index.ts"
-  },
   "keywords": [
-    "bot",
-    "discordbot",
-    "discordjs",
-    "typescript",
+    "javascript",
     "music",
-    "moonlink.js"
+    "music-player",
+    "discord-bot",
+    "music-bot",
+    "discord-js",
+    "lavalink",
+    "moonlink"
   ],
-  "author": "Luca Ramirez (lukitaz_r)",
-  "license": "MIT",
-  "packageManager": "pnpm@10.11.1",
-  "dependencies": {
-    "colors": "^1.4.0",
-    "discord.js": "^14.21.0",
-    "moonlink.js": "^4.52.2"
+  "homepage": "https://github.com/lukitaz-r/sonic-bot#readme",
+  "bugs": {
+    "url": "https://github.com/lukitaz-r/sonic-bot/issues"
   },
-  "devDependencies": {
-    "@types/node": "^24.0.14",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukitaz-r/sonic-bot.git"
+  },
+  "license": "MIT",
+  "author": "Luca Ramirez (lukitaz_r)",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ."
   }
 }
