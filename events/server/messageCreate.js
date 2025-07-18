@@ -7,7 +7,7 @@ module.exports = {
   */
   run: async (client, message) => {
     const { prefix, greetings } = client.config; 
-    // const { apiAI, vipRoles } = client.config.opcionales DESCOMENTAR PARA ACTIVAR LAS OPCIONES ADICIONALES
+    const { apiAI, vipRoles } = client.config.opcionales 
     const botId = client.user.id; // id del bot
     const tag = `<@${botId}>`; // tag del bot
 

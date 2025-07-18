@@ -1,0 +1,94 @@
+const { EmbedBuilder } = require('discord.js');
+
+/**
+ * Verifica que el usuario esté en un canal de voz.
+ * Si no, envía el mensaje de error y devuelve null.
+ */
+function ensureVoice(message) {
+  if (!message) return null;
+  const vc = message.member.voice.channel;
+  if (!vc) {
+    message.reply('❌ ¡Necesitas estar en un canal de voz primero! ❌');
+    return null;
+  }
+  return vc;
+}
+
+/**
+ * Crea o devuelve el player de LavaLink.
+ */
+function createPlayer(client, guildId, voiceChannelId, textChannelId) {
+  const player = client.manager.players.create({
+    guildId,
+    voiceChannelId,
+    textChannelId
+  });
+  player.connect({ setDeaf: true });
+  return player;
+}
+
+/**
+ * Realiza la búsqueda en YouTube Music.
+ */
+async function searchMusic(client, query, requesterId) {
+  return client.manager.search({
+    query,
+    requester: requesterId,
+    source: 'ytmsearch'
+  });
+}
+
+/**
+ * Añade toda la playlist a la cola y envía embed de confirmación.
+ */
+async function enqueuePlaylist(player, searchResult) {
+  const { tracks, playlistInfo } = searchResult;
+  player.queue.add(tracks);
+
+  player.textChannel.send({
+    embeds: [ buildEmbed({
+      author: 'Sonic Radio',
+      title: '✅ Playlist añadida',
+      description: `**${playlistInfo.name}** (${tracks.length} temas) en la cola.\n> Solicitada por <@${tracks[0].requestedBy.id}>`,
+      thumbnail: tracks[0].artworkUrl
+    }) ]
+  });
+}
+
+/**
+ * Añade un único track a la cola y envía embed de confirmación.
+ */
+async function enqueueTrack(player, track) {
+  player.queue.add(track);
+
+  player.textChannel.send({
+    embeds: [ buildEmbed({
+      author: 'Sonic Radio',
+      title: '✅ Canción añadida',
+      description: `[${track.title}](${track.url}) — ${track.author}\n> Solicitada por <@${track.requestedBy.id}>`,
+      thumbnail: track.artworkUrl
+    }) ]
+  });
+}
+
+/**
+ * Construye un EmbedBuilder a partir de un objeto de configuración.
+ */
+function buildEmbed({ author, title, description, thumbnail, color = 'Blurple' }) {
+  const e = new EmbedBuilder();
+  if (author) e.setAuthor({ name: author });
+  if (title) e.setTitle(title);
+  if (description) e.setDescription(description);
+  if (thumbnail) e.setThumbnail(thumbnail);
+  e.setColor(color);
+  return e;
+}
+
+module.exports = {
+  ensureVoice,
+  createPlayer,
+  searchMusic,
+  enqueuePlaylist,
+  enqueueTrack,
+  buildEmbed
+};

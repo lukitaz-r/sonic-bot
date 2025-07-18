@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder } = require('discord.js');
+const { createPlayer, searchMusic, enqueuePlaylist, enqueueTrack, ensureVoice, buildEmbed } = require('../../utils/music');
 
 module.exports = {
   name: 'play',
@@ -27,19 +28,54 @@ module.exports = {
    * @param interaction Interacción de slash command
    */
 
-  run: async (
+  async run(
     client,
     message,
     args,
     prefix,
     interaction
-  ) => {
-    console.log(message)
-    if (message) {
-      return message.reply("Aqui deberia pasar algo compañero...")
-    } else {
-      console.log(interaction)
-      await interaction.reply("Aqui deberia pasar algo compañero...")
+  ) {
+    // Determina el contexto (mensaje o slash)
+    const ctx = message ?? interaction;
+    const user = message?.author || interaction.user;
+
+    // 1. Asegurarse de que el usuario está en un canal de voz
+    const voiceChannel = ensureVoice(message);
+    if (!voiceChannel) return;
+
+    // 2. Crear/obtener el player de Lavalink
+    const player = createPlayer(client, message.guild.id, voiceChannel.id, ctx.channel.id);
+
+    // 3. Realizar la búsqueda
+    const query = args.join(' ');
+    const searchResult = await searchMusic(client, query, user.id);
+
+    if (!searchResult.tracks.length) {
+      return ctx.reply({ embeds: [ buildEmbed({
+        title: '🎵 Sonic Radio',
+        description: '❌ No se encontraron resultados. ❌',
+        color: 'Red'
+      }) ]});
+    }
+
+    // 4. Gestionar los distintos tipos de resultado
+    switch (searchResult.loadType) {
+      case 'playlist':
+        await enqueuePlaylist(player, searchResult);
+        break;
+      case 'track':
+      case 'search':
+        await enqueueTrack(player, searchResult.tracks[0]);
+        break;
+      case 'empty':
+        return ctx.reply('❌ No hay coincidencias para tu búsqueda. ❌');
+      case 'error':
+        return ctx.reply(`❌ Error al cargar: ${searchResult.error || 'Desconocido'} ❌`);
+    }
+
+    // 5. Iniciar reproducción si aún no está sonando
+    if (!player.playing) {
+      await player.play();
     }
   }
 }

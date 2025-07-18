@@ -7,7 +7,8 @@ module.exports = {
     if (!command) return;
     
     try {
-      command.run(client, false, false, false, interaction);
+      // como adopta los demas parametros del comando, se tiene que poner como 'falso' a todos los demas valores que no usamos.
+      command.run(client, false, false, client.config.prefix, interaction);
     } catch (error) {
       console.error(error);
       interaction.reply({
