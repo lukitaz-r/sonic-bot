@@ -73,15 +73,14 @@ client.manager.on('queueEnd', async (player) => {
     const message = await channel.send(`❌🎧 **¡Cola terminada!** Desconectando en \`30s\` si no se añaden nuevas canciones. 🎧❌`)
     const msg = await channel.messages.fetch(message.id)
     setInterval(() => {
-      if (i > 1) {
+      if (i >= 1) {
         i--
         msg.edit(`❌🎧 **¡Cola terminada!** Desconectando en \`${i}s\` si no se añaden nuevas canciones. 🎧❌`)
-      } else {
-        msg.delete()
-        return 
-      } 
+      }
     }, 1000)
-      
+    if (i < 1) {
+      msg.delete() 
+    }
   }
   
   // Se desconecta si no se añaden nuevas canciones

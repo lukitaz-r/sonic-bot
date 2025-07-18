@@ -41,34 +41,60 @@ async function searchMusic(client, query, requesterId) {
 /**
  * Añade toda la playlist a la cola y envía embed de confirmación.
  */
-async function enqueuePlaylist(player, searchResult) {
+async function enqueuePlaylist(player, searchResult, message = false, interaction = false) {
   const { tracks, playlistInfo } = searchResult;
   player.queue.add(tracks);
 
-  player.textChannel.send({
-    embeds: [ buildEmbed({
-      author: 'Sonic Radio',
-      title: '✅ Playlist añadida',
-      description: `**${playlistInfo.name}** (${tracks.length} temas) en la cola.\n> Solicitada por <@${tracks[0].requestedBy.id}>`,
-      thumbnail: tracks[0].artworkUrl
-    }) ]
-  });
+  if (message) {
+    return message.reply({
+      embeds: [ buildEmbed({
+        author: 'Sonic Radio',
+        title: '✅ Playlist añadida',
+        description: `**${playlistInfo.name}** (${tracks.length} temas) en la cola.\n> Solicitada por <@${tracks[0].requestedBy.id}>`,
+        thumbnail: tracks[0].artworkUrl
+      }) ]
+    });
+  }
+
+  if (interaction) {
+    await interaction.deferReply()
+    await interaction.editReply({
+      embeds: [ buildEmbed({
+        author: 'Sonic Radio',
+        title: '✅ Playlist añadida',
+        description: `**${playlistInfo.name}** (${tracks.length} temas) en la cola.\n> Solicitada por <@${tracks[0].requestedBy.id}>`,
+        thumbnail: tracks[0].artworkUrl
+      }) ]
+    })
+  }
 }
 
 /**
  * Añade un único track a la cola y envía embed de confirmación.
  */
-async function enqueueTrack(player, track) {
+async function enqueueTrack(player, track, message = false, interaction = false) {
   player.queue.add(track);
-
-  player.textChannel.send({
-    embeds: [ buildEmbed({
-      author: 'Sonic Radio',
-      title: '✅ Canción añadida',
-      description: `[${track.title}](${track.url}) — ${track.author}\n> Solicitada por <@${track.requestedBy.id}>`,
-      thumbnail: track.artworkUrl
-    }) ]
-  });
+  if (message) {
+    return message.reply({
+      embeds: [ buildEmbed({
+        author: 'Sonic Radio',
+        title: '✅ Canción añadida',
+        description: `[${track.title}](${track.url}) — ${track.author}\n> Solicitada por <@${track.requestedBy.id}>`,
+        thumbnail: track.artworkUrl
+      }) ]
+    });
+  }
+  if (interaction) {
+    await interaction.deferReply()
+    await interaction.editReply({
+      embeds: [ buildEmbed({
+        author: 'Sonic Radio',
+        title: '✅ Canción añadida',
+        description: `[${track.title}](${track.url}) — ${track.author}\n> Solicitada por <@${track.requestedBy.id}>`,
+        thumbnail: track.artworkUrl
+      }) ]
+    })
+  }
 }
 
 /**

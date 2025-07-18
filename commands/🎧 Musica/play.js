@@ -36,19 +36,26 @@ module.exports = {
     interaction
   ) {
     // Determina el contexto (mensaje o slash)
-    const ctx = message ?? interaction;
-    const user = message?.author || interaction.user;
+    const ctx = message || interaction;
+    const user = message.author || interaction.user;
+    let input
+    if (interaction) {
+      input = ctx.options.getString("entrada", true)
+    }
+
+    if (message) {
+      input = args.join(' ');
+    }
 
     // 1. Asegurarse de que el usuario está en un canal de voz
-    const voiceChannel = ensureVoice(message);
+    const voiceChannel = ensureVoice(ctx);
     if (!voiceChannel) return;
 
     // 2. Crear/obtener el player de Lavalink
-    const player = createPlayer(client, message.guild.id, voiceChannel.id, ctx.channel.id);
+    const player = createPlayer(client, ctx.guild.id, voiceChannel.id, ctx.channel.id);
 
     // 3. Realizar la búsqueda
-    const query = args.join(' ');
-    const searchResult = await searchMusic(client, query, user.id);
+    const searchResult = await searchMusic(client, input, user.id);
 
     if (!searchResult.tracks.length) {
       return ctx.reply({ embeds: [ buildEmbed({
@@ -61,11 +68,11 @@ module.exports = {
     // 4. Gestionar los distintos tipos de resultado
     switch (searchResult.loadType) {
       case 'playlist':
-        await enqueuePlaylist(player, searchResult);
+        await enqueuePlaylist(player, searchResult, message, interaction);
         break;
       case 'track':
       case 'search':
-        await enqueueTrack(player, searchResult.tracks[0]);
+        await enqueueTrack(player, searchResult.tracks[0], message, interaction);
         break;
       case 'empty':
         return ctx.reply('❌ No hay coincidencias para tu búsqueda. ❌');
