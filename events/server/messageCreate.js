@@ -57,7 +57,7 @@ module.exports = {
       }
 
       // Ejecutar comando
-      return command.run(client, message, args);
+      return command.run(client, message, args, prefix, false);
     }
 
     // Si no es comando

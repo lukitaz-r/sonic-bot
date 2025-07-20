@@ -59,8 +59,9 @@ module.exports = {
 
     if (!searchResult.tracks.length) {
       return ctx.reply({ embeds: [ buildEmbed({
-        title: '🎵 Sonic Radio',
-        description: '❌ No se encontraron resultados. ❌',
+        author: 'Sonic Radio',
+        title: '❌ No se encontraron resultados. ❌',
+        description: '> Surgió un problema al intentar encontrar el track.',
         color: 'Red'
       }) ]});
     }
