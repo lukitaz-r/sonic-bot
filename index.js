@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const { Manager } = require('moonlink.js')
 const config = require('./config/config.json')
 const fs = require('fs');
+const { clearTimeout } = require('timers');
 require('colors')
 const client = new Discord.Client({
     intents: [
@@ -61,38 +62,56 @@ client.manager.on('trackStart', (player, track) => {
   }
 });
 
-client.manager.on('trackEnd', (player, track) => {
-  console.log(`Canción finalizada: ${track.title}`);
-});
-
 client.manager.on('queueEnd', async (player) => {
   // Envia un mensaje cuando la cola termina
-  const channel = client.channels.cache.get(player.textChannelId);
+  const channel = client.channels.cache.get(player.textChannelId)
   if (channel) {
-    let i = 30
-    const message = await channel.send(`❌🎧 **¡Cola terminada!** Desconectando en \`30s\` si no se añaden nuevas canciones. 🎧❌`)
-    const msg = await channel.messages.fetch(message.id)
-    setInterval(() => {
-      if (i >= 1) {
-        i--
-        msg.edit(`❌🎧 **¡Cola terminada!** Desconectando en \`${i}s\` si no se añaden nuevas canciones. 🎧❌`)
+    let countdown = 30
+    let msg
+
+    try {
+      msg = await channel.send(`❌🎧 **¡Cola terminada!** Desconectando en \`${countdown}s\` si no se añaden nuevas canciones. 🎧❌`);
+    } catch (err) {
+      console.error('No pude enviar el mensaje de countdown:', err)
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      if (player.playing || player.queue.size > 0) {
+        clearInterval(interval)
+        clearTimeout(timeout)
+        try { await msg.delete(); } catch {}
+        return
+      }
+      countdown--
+      if (countdown > 0) {
+        try {
+          await msg.edit(`❌🎧 **¡Cola terminada!** Desconectando en \`${countdown}s\` si no se añaden nuevas canciones. 🎧❌`)
+        } catch (err) {
+          console.error('Error al editar el mensaje de countdown:', err)
+        }
+      } else {
+          clearInterval(interval)
+          clearTimeout(timeout)
+        try {
+          await msg.delete()
+        } catch (err) {
+          console.error('Error al borrar el mensaje de countdown:', err)
+        }
       }
     }, 1000)
-    if (i < 1) {
-      msg.delete() 
-    }
-  }
+  }  
   
   // Se desconecta si no se añaden nuevas canciones
   // Esto ayuda a ahorrar recursos
-  setTimeout(() => {
+  const timeout = setTimeout(() => {
     if (!player.playing && player.queue.size === 0) {
-      player.destroy();
+      player.destroy()
       if (channel) {
-        channel.send('❌🎧 ¡Desconectado por Inactividad! 🎧❌');
+        channel.send('❌🎧 ¡Desconectado por Inactividad! 🎧❌')
       }
     }
-  }, 30000); // 30 seconds
+  }, 30000)
 });
 
 fs.readdirSync('./handlers').forEach(handler => {
@@ -104,8 +123,6 @@ fs.readdirSync('./handlers').forEach(handler => {
     }
 });
 
-// Handle raw events for voice state updates
-// This is crucial for Moonlink.js to work properly
 client.on('raw', (packet) => {
   client.manager.packetUpdate(packet);
 });
