@@ -45,19 +45,19 @@ module.exports = {
     
     if (player.queue.size > 0) {
       const tracks = player.queue.tracks.map((track, index) => {
-        return `${index + 1}. [${track.title}](${track.url}) - ${track.author} | \`${formatDuration(track.duration)}\``;
-      });
+        return `${index + 1}. ${track.title} - ${track.author} | \`${formatDuration(track.duration)}\``;
+      })
       
-      embed.addFields({
+      embed.addFields([{
         name: 'Las que siguen:',
         value: tracks.slice(0, 10).join('\n'),
-      });
+      }])
       
       if (player.queue.size > 10) {
-        embed.addFields({
+        embed.addFields([{
           name: 'Y mas...',
           value: `${player.queue.size - 10} canciones mas en la cola.`,
-        });
+        }]);
       }
     }
 
