@@ -145,8 +145,7 @@ module.exports = {
         ]
       })
     }
-    
-    console.log(user)
+  
     player.queue.clear()
     return player.stop()
   }

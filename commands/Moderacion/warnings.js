@@ -1,6 +1,5 @@
-const {paginacion} = require(`${process.cwd()}/utils/funciones.js`);
-const warnSchema = require(`${process.cwd()}/modelos/warns.js`);
-const {asegurar_todo} = require(`${process.cwd()}/utils/funciones.js`)
+const { paginacion,  asegurar_todo } = require(`${process.cwd()}/utils/funciones.js`);
+const warnSchema = require(`${process.cwd()}/models/warns.js`);
 module.exports = {
     name: "warnings",
     aliases: ["avisos", "user-warns", "warnings-usuario", "warns"],

@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { asegurar_todo } = require(`${process.cwd()}/utils/funciones.js`)
-const warnSchema = require(`${process.cwd()}/modelos/warns.js`)
+const warnSchema = require(`${process.cwd()}/models/warns.js`)
 module.exports = {
     name: "unwarn",
     aliases: ["deswarnear", "remove-warn", "quitar-aviso"],

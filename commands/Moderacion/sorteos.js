@@ -62,13 +62,10 @@ module.exports = {
                 }).then(() => {
                     return message.reply(`✅ **Sorteo iniciado en ${canal}**`)
                 })
-            }
-
-                
-                break;
-        
+            }  
+            break
             default:
-                break;
+            break
         }
     }
 }

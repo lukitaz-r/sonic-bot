@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { asegurar_todo } = require(`${process.cwd()}/utils/funciones.js`)
-const warnSchema = require(`${process.cwd()}/modelos/warns.js`)
+const warnSchema = require(`${process.cwd()}/models/warns.js`)
 module.exports = {
     name: "warn",
     aliases: ["warnear", "avisar"],
@@ -62,7 +62,5 @@ module.exports = {
         } else {
             return message.reply(`❌ **Mi Rol está por __debajo__ del usuario que quieres avisar!**`)
         }
-
-
     }
 }

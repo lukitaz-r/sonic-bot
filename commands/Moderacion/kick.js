@@ -1,21 +1,14 @@
 const { EmbedBuilder } = require('discord.js')
-
+const { slashBuilder } = require('../Musica/play')
 module.exports = {
   name: "kick",
   aliases: ["kickear", "expulsar"],
   desc: "Sirve para expulsar a un usuario del Servidor",
-  slashBuilder: new SlashCommandBuilder()
-    .setName("kick")
-    .setDescription("🔨 ¡Expulsa a alguien no deseado!")
-    .addStringOption(opt =>
-      opt.setName("objetivo")
-        .setDescription("🔨 El usuario que deseas expulsar (ID o Mención).")
-        .setRequired(true)
-    ),
+  slashBuilder: false,
   permisos: ["KickMembers"],
   permisos_bot: ["KickMembers"],
   run: async (client, message, args, prefix, interaction) => {
-    const ctx = interaction ?? message
+    const ctx = message
     const usuario = ctx.guild.members.cache.get(args[0]) || ctx.mentions.members.first()
     if (!usuario) return ctx.reply("❌ **No se ha encontrado al usuario que has especificado!**")
     let razon = args.slice(1).join(" ") || "No se ha especificado ninguna razón!"
