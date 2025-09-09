@@ -41,7 +41,7 @@ module.exports = {
               author: 'Sonic Radio',
               title: "❌🎧 No hay una radio activa en el servidor",
               description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
@@ -55,21 +55,21 @@ module.exports = {
               author: 'Sonic Radio',
               title: "❌🎧 Debes estar en el mismo VC del bot",
               description: `> Así no funcionan las cosas...`,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
         })
       }
 
-      if (!player.current) {
+      if (!player?.current) {
         return ctx.reply({
           embeds: [
             new buildEmbed({
               author: 'Sonic Radio',
               title: "❌🎧 No hay nada sonando ahora",
               description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
@@ -85,8 +85,8 @@ module.exports = {
           new buildEmbed({
             author: 'Sonic Radio',
             title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id} \n > Pausada por <@${user.id}>`,
-            thumbnail: user.avatarUrl,
+            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            thumbnail: user.avatarURL(),
             color: 'Yellow'
           })
         ]
@@ -102,7 +102,7 @@ module.exports = {
               author: 'Sonic Radio',
               title: "❌🎧 No hay una radio en el servidor ahora mismo",
               description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
@@ -116,21 +116,21 @@ module.exports = {
               author: 'Sonic Radio',
               title: "❌🎧 Debes estar en el mismo VC del bot",
               description: `> Así no funcionan las cosas...`,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
         })
       }
 
-      if (!player.current) {
+      if (!player?.current) {
         return ctx.editReply({
           embeds: [
             new buildEmbed({
               author: 'Sonic Radio',
               title: "❌🎧 No hay nada sonando ahora",
               description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
-              thumbnail: client.user.avatarUrl,
+              thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
@@ -146,8 +146,8 @@ module.exports = {
           new buildEmbed({
             author: 'Sonic Radio',
             title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id} \n > Pausada por <@${user.id}>`,
-            thumbnail: user.avatarUrl,
+            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            thumbnail: user.avatarURL(),
             color: 'Yellow'
           })
         ]
