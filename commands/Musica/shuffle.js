@@ -1,13 +1,13 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { ensureVoice, buildEmbed } = require('../../utils/music');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { formatDuration, ensureVoice, buildEmbed } = require('../../utils/music');
 
 module.exports = {
-  name: 'pause',
-  aliases: ['pausa'],
-  desc: '🎧 ¡Pausa la canción!',
+  name: 'shuffle',
+  aliases: ['mezclar', 'mix'],
+  desc: '🎧 ¡Mezcla la lista!',
   slashBuilder: new SlashCommandBuilder()
-    .setName("pause")
-    .setDescription("🎧 ¡Pausa la canción!"),
+    .setName("shuffle")
+    .setDescription("🎧 ¡Mezcla la lista!"),
 
   /**
    * Ejecuta el comando play.
@@ -25,13 +25,16 @@ module.exports = {
     prefix,
     interaction
   ) {
+    // Determina el contexto (mensaje o slash)
     const ctx = message || interaction;
     const user = message.author || interaction.user;
-    
-    const voiceChannel = ensureVoice(ctx);
-    if (!voiceChannel) return
 
-    const player = client.manager.players.get(ctx.guild.id)
+    // 1. Asegurarse de que el usuario está en un canal de voz
+    const voiceChannel = ensureVoice(ctx);
+    if (!voiceChannel) return;
+
+    // 2. Crear/obtener el player de Lavalink
+    const player = client.manager.players.get(ctx.guild.id);
 
     if (message) {
       if (!player) {
@@ -61,34 +64,29 @@ module.exports = {
           ]
         })
       }
-
-      if (!player?.current) {
+      if (player.queue.size < 1) {
         return ctx.reply({
           embeds: [
             new buildEmbed({
               author: 'Sonic Radio',
-              title: "❌🎧 No hay nada sonando ahora",
-              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
+              title: "❌🎧 No hay una lista ahora",
+              description: `> Pon \`${prefix}play [cancion]\` o \`/play\` para añadir mas canciones`,
               thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
           ]
         })
       }
-
-      if (player.paused) {
-        return ctx.reply('**¡La canción ya está pausada!** 😅')
-      }
-
+      
       ctx.reply({
         embeds: [
           new buildEmbed({
             author: 'Sonic Radio',
-            title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            title: "🔀 Lista Mezclada",
+            description: `> La lista ha sido mezclada correctamente.`,
             thumbnail: user.avatarURL(),
-            color: 'Yellow'
-          })
+            color: 'Green'
+          }),
         ]
       })
     }
@@ -123,13 +121,13 @@ module.exports = {
         })
       }
 
-      if (!player?.current) {
+      if (!player?.queue.length) {
         return ctx.editReply({
           embeds: [
             new buildEmbed({
               author: 'Sonic Radio',
-              title: "❌🎧 No hay nada sonando ahora",
-              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
+              title: "❌🎧 No hay una lista ahora",
+              description: `> Pon \`${prefix}play [cancion]\` o \`/play\` para añadir mas canciones`,
               thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
@@ -137,23 +135,55 @@ module.exports = {
         })
       }
 
-      if (player.paused) {
-        return ctx.editReply('**¡La canción ya está pausada!** 😅')
-      }
-
-      await ctx.editReply({
+      ctx.editReply({
         embeds: [
           new buildEmbed({
             author: 'Sonic Radio',
-            title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            title: "🔀 Lista Mezclada",
+            description: `> La lista ha sido mezclada correctamente.`,
             thumbnail: user.avatarURL(),
-            color: 'Yellow'
-          })
+            color: 'Green'
+          }),
         ]
       })
     }
-  
-    return player.pause()
+
+    player.queue.shuffle();
+    
+    const embed = new EmbedBuilder()
+      .setAuthor({
+        name: 'Sonic Radio'
+      })
+      .setTitle('📃 Lista de la Radio')
+      .setColor('#0099ff')
+      .setThumbnail(ctx.guild.iconURL({ dynamic: true }))
+    
+    if (player?.current) {
+      embed.setDescription(`**Ahora suena:**\n[${player.current.title}](${player.current.url}) - ${player.current.author} | \`${formatDuration(player.current.duration)}\``);
+    }
+    
+    if (player?.queue.size > 0) {
+      const tracks = player.queue.tracks.map((track, index) => {
+        return `${index + 1}. ${track.title} - ${track.author} | \`${formatDuration(track.duration)}\``;
+      })
+      
+      embed.addFields([{
+        name: 'Las que siguen:',
+        value: tracks.slice(0, 10).join('\n'),
+      }])
+      
+      if (player.queue.size > 10) {
+        embed.addFields([{
+          name: 'Y mas...',
+          value: `${player.queue.size - 10} canciones mas en la cola.`,
+        }]);
+      }
+    }
+
+    ctx.reply({
+      embeds: [
+        embed
+      ]
+    })
   }
 }

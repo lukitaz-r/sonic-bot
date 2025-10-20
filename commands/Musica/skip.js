@@ -68,7 +68,7 @@ module.exports = {
             new buildEmbed({
               author: 'Sonic Radio',
               title: "❌🎧 No hay nada sonando ahora",
-              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
+              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
               thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
@@ -96,7 +96,7 @@ module.exports = {
             new buildEmbed({
               author: 'Sonic Radio',
               title: "❌🎧 No hay una radio en el servidor ahora mismo",
-              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
+              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
               thumbnail: client.user.avatarURL(),
               color: 'Red'
             })
@@ -124,7 +124,7 @@ module.exports = {
             new buildEmbed({
               author: 'Sonic Radio',
               title: "❌🎧 No hay nada sonando ahora",
-              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\'`,
+              description: `> Si quieres escuchar musica, pon \`${prefix}play [cancion]\` o \`/play\``,
               thumbnail: client.user.avatarURL(),
               color: 'Red'
             })

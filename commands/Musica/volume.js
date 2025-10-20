@@ -1,13 +1,18 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { ensureVoice, buildEmbed } = require('../../utils/music');
+const { createPlayer, searchMusic, enqueuePlaylist, enqueueTrack, ensureVoice, buildEmbed } = require('../../utils/music');
 
 module.exports = {
-  name: 'pause',
-  aliases: ['pausa'],
-  desc: '🎧 ¡Pausa la canción!',
+  name: 'volume',
+  aliases: ['vol', 'v'],
+  desc: '🎧 Cambia el volumen de la radio',
   slashBuilder: new SlashCommandBuilder()
-    .setName("pause")
-    .setDescription("🎧 ¡Pausa la canción!"),
+    .setName("volume")
+    .setDescription("🎧 Cambia el volumen de la radio")
+    .addIntegerOption(opt =>
+      opt.setName("numero")
+        .setDescription("🎧 número del 1 al 1000.")
+        .setRequired(true)
+    ),
 
   /**
    * Ejecuta el comando play.
@@ -25,13 +30,26 @@ module.exports = {
     prefix,
     interaction
   ) {
+    // Determina el contexto (mensaje o slash)
     const ctx = message || interaction;
     const user = message.author || interaction.user;
-    
-    const voiceChannel = ensureVoice(ctx);
-    if (!voiceChannel) return
+    let input
+    if (interaction) {
+      input = ctx.options.getInteger("numero", true)
+    }
 
-    const player = client.manager.players.get(ctx.guild.id)
+    if (message) {
+      input = args[0];
+    }
+
+    const volume = parseInt(input)
+
+    // 1. Asegurarse de que el usuario está en un canal de voz
+    const voiceChannel = ensureVoice(ctx);
+    if (!voiceChannel) return;
+
+    // 2. Crear/obtener el player de Lavalink
+    const player = client.manager.players.get(ctx.guild.id);
 
     if (message) {
       if (!player) {
@@ -76,18 +94,42 @@ module.exports = {
         })
       }
 
-      if (player.paused) {
-        return ctx.reply('**¡La canción ya está pausada!** 😅')
+      if (isNaN(volume)) {
+        return ctx.reply({
+          embeds: [
+            new buildEmbed({
+              author: 'Sonic Radio',
+              title: "❌🎧 Número invalido",
+              description: `> Por favor, introduzca un valor válido entre 1 y 100.`,
+              thumbnail: client.user.avatarURL(),
+              color: 'Red'
+            })
+          ]
+        })
+      }
+
+      if (volume < 0 || volume > 1000) {
+        return ctx.reply({
+          embeds: [
+            new buildEmbed({
+              author: 'Sonic Radio',
+              title: "❌🎧 Número invalido",
+              description: `> Por favor, introduzca un valor válido entre 1 y 100.`,
+              thumbnail: client.user.avatarURL(),
+              color: 'Red'
+            })
+          ]
+        })
       }
 
       ctx.reply({
         embeds: [
           new buildEmbed({
             author: 'Sonic Radio',
-            title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            title: "➕ Volumen Cambiado",
+            description: `> Se ajustó el volumen a ${volume}`,
             thumbnail: user.avatarURL(),
-            color: 'Yellow'
+            color: 'Green'
           })
         ]
       })
@@ -137,23 +179,47 @@ module.exports = {
         })
       }
 
-      if (player.paused) {
-        return ctx.editReply('**¡La canción ya está pausada!** 😅')
+      if (isNaN(volume)) {
+        return ctx.editReply({
+          embeds: [
+            new buildEmbed({
+              author: 'Sonic Radio',
+              title: "❌🎧 Número invalido",
+              description: `> Por favor, introduzca un valor válido entre 1 y 1000.`,
+              thumbnail: client.user.avatarURL(),
+              color: 'Red'
+            })
+          ]
+        })
       }
 
-      await ctx.editReply({
+      if (volume < 0 || volume > 1000) {
+        return ctx.editReply({
+          embeds: [
+            new buildEmbed({
+              author: 'Sonic Radio',
+              title: "❌🎧 Número invalido",
+              description: `> Por favor, introduzca un valor válido entre 1 y 1000.`,
+              thumbnail: client.user.avatarURL(),
+              color: 'Red'
+            })
+          ]
+        })
+      }
+
+      ctx.editReply({
         embeds: [
           new buildEmbed({
             author: 'Sonic Radio',
-            title: "⏸️ Canción pausada",
-            description: `[${player.current.title}](${player.current.url}) - ${player.current.author} \n > Solicitada por <@${player.current.requestedBy.id}> \n > Pausada por <@${user.id}>`,
+            title: "➕ Volumen Cambiado",
+            description: `> Se ajustó el volumen a ${volume}`,
             thumbnail: user.avatarURL(),
-            color: 'Yellow'
+            color: 'Green'
           })
         ]
       })
     }
-  
-    return player.pause()
+
+    player.setVolume(volume)
   }
 }
