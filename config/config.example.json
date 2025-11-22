@@ -1,0 +1,20 @@
+{
+  "token": "",
+  "mongodb": "",
+  "prefix": "so!",
+  "color": "Blurple",
+  "greetings": [
+    "Hola, pon `?help` para ver mis comandos! 🚀",
+    "Holaaa!"
+  ],
+  "lavalink": {
+    "host": "",
+    "port": 2333,
+    "password": "",
+    "secure": false
+  },
+  "opcionales": {
+    "apiAI": false,
+    "vipRoles": []
+  }
+}
