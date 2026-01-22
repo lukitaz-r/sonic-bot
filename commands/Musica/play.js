@@ -56,7 +56,6 @@ module.exports = {
 
     // 3. Realizar la búsqueda
     const searchResult = await searchMusic(client, input, user.id);
-
     if (!searchResult.tracks.length) {
       return ctx.reply({ embeds: [ buildEmbed({
         author: 'Sonic Radio',

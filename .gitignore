@@ -139,7 +139,8 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Bot Config
-application.yml
+# application.yml
 Lavalink.jar
 config.json
 package-lock.json
+bun.lock

@@ -37,6 +37,12 @@ client.manager = new Manager({
     if (guild) guild.shard.send(JSON.parse(payload));
   },
   autoPlay: true,
+  // Opciones adicionales
+  options: {
+    // Deshabilita los plugins nativos de Spotify/YouTube en moonlink.js
+    // para que todas las búsquedas pasen por LavaSrc en Lavalink
+    disableNativeSources: true,
+  },
 });
 
 client.manager.on('nodeConnected', (node) => {

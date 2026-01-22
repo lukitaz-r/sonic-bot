@@ -1,6 +1,6 @@
 # 🎵 Sonic Bot
 
-Bot multifuncional de Discord con funcionalidades de música, moderación e información. Desarrollado con Discord.js v14 y Lavalink para reproducción de audio de alta calidad.
+Bot multifuncional de Discord con funcionalidades de música, moderación e información. Desarrollado con Discord.js v14 y NodeLink para reproducción de audio de alta calidad.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Discord.js](https://img.shields.io/badge/discord.js-v14.21.0-blue.svg)](https://discord.js.org/)
@@ -9,8 +9,9 @@ Bot multifuncional de Discord con funcionalidades de música, moderación e info
 ## 📋 Características
 
 ### 🎧 Música
-- **Reproducción de audio** con Lavalink y Moonlink.js
-- Soporte para múltiples plataformas (YouTube, SoundCloud, Bandcamp, Twitch, Vimeo)
+- **Reproducción de audio** con NodeLink y Moonlink.js
+- Soporte para múltiples plataformas (Deezer, Spotify, SoundCloud, Twitch)
+- **Fallback inteligente:** Links de Spotify/YouTube se resuelven automáticamente a Deezer
 - Control de reproducción (play, pause, resume, skip, stop)
 - Sistema de colas con shuffle
 - Control de volumen
@@ -32,8 +33,9 @@ Bot multifuncional de Discord con funcionalidades de música, moderación e info
 ### Requisitos Previos
 
 - **Node.js** v16.0.0 o superior
+- **Bun** (runtime alternativo, opcional pero recomendado)
 - **MongoDB** (para almacenamiento de datos)
-- **Java** 11 o superior (para Lavalink)
+- **NodeLink** (servidor de audio - reemplazo de Lavalink)
 - **Git** (opcional, para clonar el repositorio)
 
 ### Pasos de Instalación
@@ -87,20 +89,16 @@ Edita `config/config.json` con tus credenciales:
 - `lavalink.host`: Host de tu servidor Lavalink (por defecto: `localhost`)
 - `lavalink.password`: Contraseña configurada en `application.yml`
 
-#### b) Configuración de Lavalink (`application.yml`)
-Copia el archivo de ejemplo:
-```bash
-cp application-example.yml application.yml
-```
+#### b) Configuración de NodeLink
 
-Edita `application.yml` y configura la contraseña (línea 22):
-```yaml
-lavalink:
-  server:
-    password: "TU_CONTRASEÑA_SEGURA"
-```
+NodeLink es el servidor de audio que reemplaza a Lavalink. Descarga o clona NodeLink desde [PerformanC/NodeLink](https://github.com/PerformanC/NodeLink).
 
-> **Nota:** Asegúrate de que la contraseña en `application.yml` coincida con la de `config/config.json`
+Configura el archivo `config.json` de NodeLink con:
+- Credenciales de Spotify (clientId, clientSecret)
+- ARL de Deezer (para streaming)
+- Puerto y contraseña (deben coincidir con `config/config.json`)
+
+> **Nota:** NodeLink no requiere Java, usa Node.js/Bun directamente.
 
 4. **Configurar intents del bot**
 
@@ -111,26 +109,24 @@ Ve al [Discord Developer Portal](https://discord.com/developers/applications) y 
 
 ## ▶️ Ejecución
 
-### 1. Iniciar Lavalink
+### 1. Iniciar NodeLink
 
-En una terminal separada, ejecuta:
+En una terminal separada, ejecuta desde el directorio de NodeLink:
 ```bash
-java -jar Lavalink.jar
+bun run start
+# o
+node src/index.js
 ```
 
-Espera a ver el mensaje: `Lavalink is ready to accept connections.`
+Espera a ver los mensajes de las fuentes cargadas (Spotify, Deezer, SoundCloud).
 
 ### 2. Iniciar el Bot
 
 En otra terminal:
 ```bash
 npm start
-```
-
-o
-
-```bash
-node index.js
+# o con bun
+bun run test
 ```
 
 Si todo está configurado correctamente, verás:
@@ -153,11 +149,10 @@ sonic-bot/
 │   └── server/        # Eventos del servidor
 ├── handlers/          # Cargadores de comandos y eventos
 ├── models/            # Modelos de MongoDB
-├── plugins/           # Plugins de Lavalink
+├── plugins/           # (Deprecated - NodeLink no usa plugins)
 ├── utils/             # Utilidades y funciones auxiliares
 ├── logs/              # Archivos de log (generados automáticamente)
-├── application.yml    # Configuración de Lavalink (no incluido en Git)
-├── Lavalink.jar       # Servidor de audio Lavalink (no incluido en Git)
+├── jsconfig.json      # Configuración de JavaScript para autocompletado
 ├── index.js           # Punto de entrada principal
 └── package.json       # Dependencias y scripts
 ```
@@ -193,7 +188,7 @@ sonic-bot/
 ## 🔧 Dependencias Principales
 
 - **[discord.js](https://discord.js.org/)** (v14.21.0) - Librería para interactuar con la API de Discord
-- **[moonlink.js](https://www.npmjs.com/package/moonlink.js)** (v4.52.2) - Cliente de Lavalink para Node.js
+- **[moonlink.js](https://www.npmjs.com/package/moonlink.js)** (v4.60.21) - Cliente de NodeLink/Lavalink para Node.js
 - **[mongoose](https://mongoosejs.com/)** (v8.16.4) - ODM para MongoDB
 - **[discord-giveaways](https://www.npmjs.com/package/discord-giveaways)** (v6.0.1) - Sistema de sorteos
 - **[discord-html-transcripts](https://www.npmjs.com/package/discord-html-transcripts)** (v3.2.0) - Generador de transcripciones
@@ -204,15 +199,13 @@ sonic-bot/
 Los siguientes archivos **NO** se incluyen en el repositorio por seguridad y deben ser configurados manualmente:
 
 - `config/config.json` - Contiene tokens y credenciales sensibles
-- `application.yml` - Configuración de Lavalink con contraseñas
-- `Lavalink.jar` - Archivo binario de Lavalink
+- `bun.lock` - Archivo de lock de Bun
 - `node_modules/` - Dependencias (se instalan con `npm install`)
 - `logs/` - Archivos de registro
 - `.env` - Variables de entorno
 
 **Archivos de ejemplo incluidos:**
 - ✅ `config/config.example.json`
-- ✅ `application-example.yml`
 
 ## 🐛 Solución de Problemas
 
@@ -220,10 +213,10 @@ Los siguientes archivos **NO** se incluyen en el repositorio por seguridad y deb
 - Verifica que el token en `config/config.json` sea correcto
 - Asegúrate de haber habilitado los intents necesarios en el Developer Portal
 
-### Lavalink no se conecta
-- Verifica que Java esté instalado: `java -version`
+### NodeLink no se conecta
 - Asegúrate de que el puerto 2333 no esté en uso
-- Revisa que la contraseña en `application.yml` coincida con `config/config.json`
+- Verifica que la contraseña en NodeLink coincida con `config/config.json`
+- Revisa que las credenciales de Spotify y el ARL de Deezer sean válidos
 
 ### Error de MongoDB
 - Verifica que MongoDB esté ejecutándose
@@ -231,9 +224,10 @@ Los siguientes archivos **NO** se incluyen en el repositorio por seguridad y deb
 - Si usas MongoDB Atlas, verifica que tu IP esté en la lista blanca
 
 ### Los comandos de música no funcionan
-- Asegúrate de que Lavalink esté ejecutándose
-- Verifica los logs de Lavalink para errores
-- Comprueba que el plugin de YouTube esté cargado correctamente
+- Asegúrate de que NodeLink esté ejecutándose
+- Verifica los logs de NodeLink para errores
+- Comprueba que Deezer esté configurado correctamente (ARL válido)
+- Si falla el streaming, el ARL de Deezer puede estar expirado
 
 ## 📝 Licencia
 
@@ -258,7 +252,8 @@ Las contribuciones son bienvenidas. Por favor:
 - [Repositorio GitHub](https://github.com/lukitaz-r/sonic-bot)
 - [Reportar un Bug](https://github.com/lukitaz-r/sonic-bot/issues)
 - [Discord.js Documentation](https://discord.js.org/)
-- [Lavalink Documentation](https://lavalink.dev/)
+- [NodeLink Documentation](https://github.com/PerformanC/NodeLink)
+- [Moonlink.js Documentation](https://moonlink.js.org/)
 
 ## ⚠️ Disclaimer
 

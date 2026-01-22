@@ -27,15 +27,106 @@ function createPlayer(client, guildId, voiceChannelId, textChannelId) {
   return player
 }
 
-/**
- * Realiza la búsqueda en YouTube Music.
- */
+
 async function searchMusic(client, query, requesterId) {
+  // Si es un link de Spotify, resolver primero y luego buscar en Deezer
+  if (query.includes("spotify.com")) {
+    // Primero resolver el link de Spotify para obtener metadata
+    const spotifyResult = await client.manager.search({
+      query: query,
+      requester: requesterId
+    });
+    
+    // Si encontramos tracks, usar title y author para buscar en Deezer
+    if (spotifyResult.tracks && spotifyResult.tracks.length > 0) {
+      const track = spotifyResult.tracks[0];
+      const searchQuery = `${track.title} ${track.author}`;
+      
+      // Buscar en Deezer con el título y autor
+      const deezerResult = await client.manager.search({
+        query: searchQuery,
+        requester: requesterId,
+        source: "dzsearch"
+      });
+      
+      // Si Deezer encuentra resultados, usarlos
+      if (deezerResult.tracks && deezerResult.tracks.length > 0) {
+        return deezerResult;
+      }
+    }
+    
+    // Si no funciona, devolver el resultado original de Spotify
+    return spotifyResult;
+  }
+  
+  // Links de Deezer se pasan directamente
+  if (query.includes("deezer.com")) {
+    return client.manager.search({
+      query: query,
+      requester: requesterId
+    });
+  }
+  
+  // Si es un link de YouTube Music, convertir a link normal de YouTube
+  if (query.includes("music.youtube.com")) {
+    // Extraer el video ID del link de YouTube Music
+    const videoIdMatch = query.match(/[?&]v=([^&]+)/);
+    if (videoIdMatch) {
+      const videoId = videoIdMatch[1];
+      // Convertir a link normal de YouTube
+      query = `https://www.youtube.com/watch?v=${videoId}`;
+    }
+  }
+  
+  // Si es un link de YouTube, resolver primero y luego buscar en Deezer
+  if (query.includes("youtube.com") || query.includes("youtu.be")) {
+    // Workaround: agregar parámetro list si no existe (evita detección anti-bot)
+    if (!query.includes("list=") && query.includes("watch?v=")) {
+      query = query + "&list=RD" + query.match(/v=([^&]+)/)?.[1];
+    }
+    
+    // Primero intentar resolver el link de YouTube para obtener metadata
+    const youtubeResult = await client.manager.search({
+      query: query,
+      requester: requesterId
+    });
+    
+    // Si encontramos tracks, usar title y author para buscar en Deezer
+    if (youtubeResult.tracks && youtubeResult.tracks.length > 0) {
+      const track = youtubeResult.tracks[0];
+      const searchQuery = `${track.title} ${track.author}`;
+      
+      // Buscar en Deezer con el título y autor
+      const deezerResult = await client.manager.search({
+        query: searchQuery,
+        requester: requesterId,
+        source: "dzsearch"
+      });
+      
+      // Si Deezer encuentra resultados, usarlos
+      if (deezerResult.tracks && deezerResult.tracks.length > 0) {
+        return deezerResult;
+      }
+    }
+    
+    // Si no funciona, devolver el resultado original de YouTube
+    return youtubeResult;
+  }
+  
+  // Otros URLs se pasan directamente
+  if (query.startsWith("http")) {
+    return client.manager.search({
+      query: query,
+      requester: requesterId
+    });
+  }
+  
+  // Búsquedas de texto usan dzsearch para buscar en Deezer
   return client.manager.search({
-    query,
+    query: query,
     requester: requesterId,
-    source: 'ytmsearch'
-  })
+    source: "dzsearch"
+  });
 }
 
 /**
